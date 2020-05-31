@@ -237,9 +237,6 @@ module Grape
           @parent.push_declared_params [element => @declared_params]
         else
           @api.namespace_stackable(:declared_params, @declared_params)
-
-          @api.route_setting(:declared_params, []) unless @api.route_setting(:declared_params)
-          @api.route_setting(:declared_params, @api.namespace_stackable(:declared_params).flatten)
         end
       end
 

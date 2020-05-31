@@ -41,7 +41,7 @@ describe Grape::Validations do
         subject.params do
           optional :some_param
         end
-        expect(subject.route_setting(:declared_params)).to eq([:some_param])
+        expect(subject.namespace_stackable(:declared_params).flatten).to eq([:some_param])
       end
     end
 
@@ -61,7 +61,7 @@ describe Grape::Validations do
 
       it 'adds entity documentation to declared params' do
         define_optional_using
-        expect(subject.route_setting(:declared_params)).to eq(%i[field_a field_b])
+        expect(subject.namespace_stackable(:declared_params).flatten).to eq(%i[field_a field_b])
       end
 
       it 'works when field_a and field_b are not present' do
@@ -108,7 +108,7 @@ describe Grape::Validations do
         subject.params do
           requires :some_param
         end
-        expect(subject.route_setting(:declared_params)).to eq([:some_param])
+        expect(subject.namespace_stackable(:declared_params).flatten).to eq([:some_param])
       end
 
       it 'works when required field is present but nil' do
@@ -193,7 +193,7 @@ describe Grape::Validations do
 
       it 'adds entity documentation to declared params' do
         define_requires_all
-        expect(subject.route_setting(:declared_params)).to eq(%i[required_field optional_field])
+        expect(subject.namespace_stackable(:declared_params).flatten).to eq(%i[required_field optional_field])
       end
 
       it 'errors when required_field is not present' do
@@ -228,7 +228,7 @@ describe Grape::Validations do
 
       it 'adds entity documentation to declared params' do
         define_requires_none
-        expect(subject.route_setting(:declared_params)).to eq(%i[required_field optional_field])
+        expect(subject.namespace_stackable(:declared_params).flatten).to eq(%i[required_field optional_field])
       end
 
       it 'errors when required_field is not present' do
@@ -258,7 +258,7 @@ describe Grape::Validations do
 
         it 'adds only the entity documentation to declared params, nothing more' do
           define_requires_all
-          expect(subject.route_setting(:declared_params)).to eq(%i[required_field optional_field])
+          expect(subject.namespace_stackable(:declared_params).flatten).to eq(%i[required_field optional_field])
         end
       end
 
@@ -324,7 +324,7 @@ describe Grape::Validations do
             requires :key
           end
         end
-        expect(subject.route_setting(:declared_params)).to eq([items: [:key]])
+        expect(subject.namespace_stackable(:declared_params).flatten).to eq([items: [:key]])
       end
     end
 
@@ -396,7 +396,7 @@ describe Grape::Validations do
             requires :key
           end
         end
-        expect(subject.route_setting(:declared_params)).to eq([items: [:key]])
+        expect(subject.namespace_stackable(:declared_params).flatten).to eq([items: [:key]])
       end
     end
 
@@ -459,7 +459,7 @@ describe Grape::Validations do
             requires :key
           end
         end
-        expect(subject.route_setting(:declared_params)).to eq([items: [:key]])
+        expect(subject.namespace_stackable(:declared_params).flatten).to eq([items: [:key]])
       end
     end
 
@@ -813,7 +813,7 @@ describe Grape::Validations do
             requires :key
           end
         end
-        expect(subject.route_setting(:declared_params)).to eq([items: [:key]])
+        expect(subject.namespace_stackable(:declared_params).flatten).to eq([items: [:key]])
       end
     end
 
@@ -877,7 +877,7 @@ describe Grape::Validations do
             requires(:required_subitems, type: Array) { requires :value }
           end
         end
-        expect(subject.route_setting(:declared_params)).to eq([items: [:key, { optional_subitems: [:value] }, { required_subitems: [:value] }]])
+        expect(subject.namespace_stackable(:declared_params).flatten).to eq([items: [:key, { optional_subitems: [:value] }, { required_subitems: [:value] }]])
       end
     end
 
@@ -1122,14 +1122,14 @@ describe Grape::Validations do
           subject.params do
             use :pagination
           end
-          expect(subject.route_setting(:declared_params)).to eq %i[page per_page]
+          expect(subject.namespace_stackable(:declared_params).flatten).to eq %i[page per_page]
         end
 
         it 'by #use with multiple params' do
           subject.params do
             use :pagination, :period
           end
-          expect(subject.route_setting(:declared_params)).to eq %i[page per_page start_date end_date]
+          expect(subject.namespace_stackable(:declared_params).flatten).to eq %i[page per_page start_date end_date]
         end
       end
 
