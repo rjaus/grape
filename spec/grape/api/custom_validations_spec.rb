@@ -45,6 +45,11 @@ describe Grape::Validations do
       expect(last_response.status).to eq 200
       expect(last_response.body).to eq 'bacon'
     end
+    it 'text is not present in request' do
+      get '/'
+      expect(last_response.status).to eq 400
+      expet(last_response.body).to eq 'text is missing'
+    end
   end
 
   context 'using a custom body-only validator' do
