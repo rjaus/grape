@@ -45,10 +45,59 @@ describe Grape::Validations do
       expect(last_response.status).to eq 200
       expect(last_response.body).to eq 'bacon'
     end
+  end
+
+  context 'using a custom length validator with fail_fast and allow_blank' do
+    before do
+      module CustomValidationsSpec
+        class DefaultLength < Grape::Validations::Base
+          def validate_param!(attr_name, params)
+            @option = params[:max].to_i if params.key?(:max)
+            return if params[attr_name].length <= @option
+            raise Grape::Exceptions::Validation.new(params: [@scope.full_name(attr_name)], message: "must be at the most #{@option} characters long")
+          end
+        end
+      end
+    end
+    subject do
+      Class.new(Grape::API) do
+        params do
+          requires :text, allow_blank: false, default_length: 140, fail_fast: true
+        end
+        get do
+          'bacon'
+        end
+      end
+    end
+
+    def app
+      subject
+    end
+
+    it 'under 140 characters' do
+      get '/', text: 'abc'
+      expect(last_response.status).to eq 200
+      expect(last_response.body).to eq 'bacon'
+    end
+    it 'over 140 characters' do
+      get '/', text: 'a' * 141
+      expect(last_response.status).to eq 400
+      expect(last_response.body).to eq 'text must be at the most 140 characters long'
+    end
+    it 'specified in the query string' do
+      get '/', text: 'a' * 141, max: 141
+      expect(last_response.status).to eq 200
+      expect(last_response.body).to eq 'bacon'
+    end
     it 'text is not present in request' do
       get '/'
       expect(last_response.status).to eq 400
-      expet(last_response.body).to eq 'text is missing'
+      expect(last_response.body).to eq 'text is missing'
+    end
+    it 'text is empty' do
+      get '/', text: ''
+      expect(last_response.status).to eq 400
+      expect(last_response.body).to eq 'text is empty'
     end
   end
 
